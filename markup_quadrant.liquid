@@ -1,0 +1,153 @@
+<div class="layout layout--col layout--top gap--[4px] px--2 py--2">
+
+  <!-- HEADER -->
+  <div class="w--full bg--black flex flex--row gap--distribute flex--center-y px--2 py--1.5 rounded--[8px]">
+
+    <span class="title title--medium text--white font--bold" style="min-width: 0;">
+      {{ date_main | upcase }}<sup>{{ date_ordinal }}</sup>
+    </span>
+
+    <div class="flex flex--row flex--right flex--center-y gap--1.5">
+      <img
+        src="https://raw.githubusercontent.com/IshyB/Hubbies/main/{{ weather.icon }}.png"
+        class="image image--contain w--[32px] h--[32px]"
+        alt="{{ weather.condition }}"
+        >
+      <span class="title title--medium text--white font--bold" style="white-space: nowrap;">{{ weather.temp }}°</span>
+    </div>
+
+  </div>
+
+  <!-- WORK STRIP -->
+  {% if work_strip.size > 0 or garbage_label != blank %}
+  <div class="w--full flex flex--row gap--distribute flex--top px--1">
+    <div class="flex flex--row flex--left gap--[8px]">
+      {% for item in work_strip limit: 2 %}
+      <div class="flex flex--col flex--center gap--[0px]">
+        <span class="description font--small bg--black text--white font--bold rounded--full px--1.5 py--0.5" style="white-space: nowrap; font-size: 9px;">{{ item.title }}</span>
+        <span class="description font--small font--regular text--black mt--[-4px]" style="white-space: nowrap; font-size: 9px;">{{ item.time }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% if garbage_label != blank %}
+    <span class="description font--small bg--black text--white font--bold rounded--full px--1.5 py--0.5 shrink-0" style="white-space: nowrap; font-size: 9px;">{{ garbage_label | upcase }}</span>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- CONTENT AREA - fills remaining space, matches Full's proven mechanism -->
+  <div class="w--full flex flex--col stretch-y overflow--hidden">
+
+    {% if not_connected %}
+
+    <div class="w--full h--full flex flex--col flex--center">
+      <span class="description font--small bg--black text--white font--bold rounded--full px--3 py--1" style="white-space: nowrap;">
+        {{ "SIGN IN TO CONNECT" }}
+      </span>
+    </div>
+
+    {% elsif events.size > 0 %}
+
+    <div class="flex flex--col w--full gap--[6px]">
+
+      {% for event in events limit: 4 %}
+
+      {% case event.color %}
+      {% when 'paper' %}
+      {% assign box_bg = 'bg--white' %}
+      {% assign box_text = 'text--black' %}
+      {% assign pill_bg = 'bg--black' %}
+      {% assign pill_text = 'text--white' %}
+
+      {% when 'light-grey' %}
+      {% assign box_bg = 'bg--white md:bg--white lg:bg--gray-65' %}
+      {% assign box_text = 'text--black' %}
+      {% assign pill_bg = 'bg--black' %}
+      {% assign pill_text = 'text--white' %}
+
+      {% when 'medium-grey' %}
+      {% assign box_bg = 'bg--black md:bg--black lg:bg--gray-40' %}
+      {% assign box_text = 'text--white lg:text--black' %}
+      {% assign pill_bg = 'bg--white lg:bg--black' %}
+      {% assign pill_text = 'text--black lg:text--white' %}
+
+      {% when 'slate' %}
+      {% assign box_bg = 'bg--black md:bg--black lg:bg--gray-25' %}
+      {% assign box_text = 'text--white' %}
+      {% assign pill_bg = 'bg--white' %}
+      {% assign pill_text = 'text--black' %}
+
+      {% when 'charcoal' %}
+      {% assign box_bg = 'bg--black md:bg--black lg:bg--gray-15' %}
+      {% assign box_text = 'text--white' %}
+      {% assign pill_bg = 'bg--white' %}
+      {% assign pill_text = 'text--black' %}
+
+      {% else %}
+      {% assign box_bg = 'bg--black' %}
+      {% assign box_text = 'text--white' %}
+      {% assign pill_bg = 'bg--white' %}
+      {% assign pill_text = 'text--black' %}
+      {% endcase %}
+
+      <div
+        class="flex flex--row flex--center-y gap--2 {{ box_bg }} w--full rounded--[8px] px--3"
+        style="border: 2px solid black !important; min-height: 40px;"
+        >
+        <span class="description font--small {{ pill_bg }} {{ pill_text }} font--bold rounded--full px--2 py--0.5 shrink-0" style="white-space: nowrap;">
+          {{ event.time }}
+        </span>
+
+        <div class="flex flex--col flex--left grow 1bit:text-stroke" style="min-width: 0;">
+          <span class="description {{ box_text }} font--bold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%;">
+            {{ event.title }}
+          </span>
+        </div>
+
+        {% if event.show_avatar and event.avatar_urls.size > 0 %}
+        <div class="flex flex--row gap--[2px] shrink-0">
+          {% for avatar in event.avatar_urls %}
+          <div class="flex flex--center-x flex--center-y w--[28px] h--[28px] shrink-0">
+            <img
+              src="{{ avatar }}"
+              class="image image--cover w--full h--full"
+              alt="{{ event.name }}"
+              >
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <span class="description font--small {{ pill_bg }} {{ pill_text }} font--bold rounded--full shrink-0 px--2 py--0.5" style="font-size: 9px;">
+          {{ event.name }}
+        </span>
+        {% endif %}
+      </div>
+
+      {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="w--full h--full flex flex--col flex--center">
+      <span class="description font--small bg--black text--white font--bold rounded--full px--3 py--1" style="white-space: nowrap;">
+        {{ "NOTHING TODAY" }}
+      </span>
+    </div>
+
+    {% endif %}
+
+  </div>
+
+  <!-- SPOTLIGHT (footer, always pinned to bottom) -->
+  {% if dinner %}
+  <div
+    class="flex flex--row flex--left flex--center-y gap--2 bg--black w--full rounded--[8px] py--1"
+    style="border: 2px solid black !important;"
+    >
+    <span class="description font--small bg--white text--black font--bold rounded--full px--2 py--0.5 shrink-0" style="white-space: nowrap;">{{ dinner.label }}</span>
+    <span class="description font--small font--regular text--white grow" data-clamp="1">{{ dinner.menu }}</span>
+  </div>
+  {% endif %}
+
+</div>
